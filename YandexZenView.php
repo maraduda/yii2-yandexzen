@@ -4,7 +4,7 @@ namespace Maraduda\yii\extensions\YandexZen;
 
 use Zelenin\Rss;
 
-class YandexZenView extends Rss
+class YandexZenView extends RssView
 {
 
 }
