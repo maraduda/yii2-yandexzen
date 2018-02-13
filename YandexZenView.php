@@ -9,7 +9,7 @@ use yii\widgets\BaseListView;
 use Zelenin\Feed;
 use Zelenin\Rss;
 
-class RssView extends Zelenin\Rss
+class YandexZenView extends Zelenin\Rss
 {
 
 }
