@@ -25,7 +25,11 @@ class YandexZenFeed extends DOMDocument
         $this->encoding = 'utf-8';
         $rssElement = $this->createElement('rss');
         $rssElement->setAttribute('version', '2.0');
+        $rssElement->setAttribute('xmlns:content', 'http://purl.org/rss/1.0/modules/content/');
+        $rssElement->setAttribute('xmlns:dc', 'http://purl.org/dc/elements/1.1/');
+        $rssElement->setAttribute('xmlns:media', 'http://search.yahoo.com/mrss/');
         $rssElement->setAttribute('xmlns:atom', 'http://www.w3.org/2005/Atom');
+        $rssElement->setAttribute('xmlns:georss', 'http://www.georss.org/georss');
         $this->rss = $this->appendChild($rssElement);
     }
 
@@ -33,16 +37,6 @@ class YandexZenFeed extends DOMDocument
     {
         $channelElement = $this->createElement('channel');
         $this->channel = $this->rss->appendChild($channelElement);
-
-        $this->addChannelElement('atom:link', '', [
-            'href' => $href
-                ? $href
-                : $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'],
-            'rel' => 'self',
-            'type' => 'application/rss+xml'
-        ]);
-        $this->addChannelGenerator();
-        $this->addChannelDocs();
         return $this;
     }
 
@@ -131,16 +125,6 @@ class YandexZenFeed extends DOMDocument
             : $this->addChannelElement('category', $value);
     }
 
-    public function addChannelGenerator()
-    {
-        return $this->addChannelElement('generator', 'RSS Generator ' . static::VERSION);
-    }
-
-    public function addChannelDocs()
-    {
-        return $this->addChannelElement('docs', 'http://www.rssboard.org/rss-specification');
-    }
-
     public function addChannelCloud($domain, $port, $path, $registerProcedure, $protocol)
     {
         return $this->addChannelElement('cloud', '', [
@@ -213,6 +197,15 @@ class YandexZenFeed extends DOMDocument
         foreach ($attr as $key => $value) {
             $element->setAttribute($key, $this->normalizeString($value));
         }
+        $this->item->appendChild($element);
+        return $this;
+    }
+
+    public function addCDATASection($element, $value)
+    {
+        $element = $this->createElement($element);
+        $section = $this->createCDATASection($value);
+        $element->appendChild($section);
         $this->item->appendChild($element);
         return $this;
     }
@@ -301,8 +294,10 @@ class YandexZenFeed extends DOMDocument
 
     private function normalizeString($string)
     {
+
         $string = html_entity_decode($string, ENT_HTML5, $this->encoding);
         $string = htmlspecialchars($string, ENT_QUOTES, $this->encoding, false);
+
         return $string;
     }
 }

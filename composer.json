@@ -24,9 +24,7 @@
     "source": "https://github.com/maraduda/yii2-yandexzen"
   },
   "require": {
-    "yiisoft/yii2": "~2",
-    "zelenin/rss-generator": "~2.1@stable",
-    "zelenin/yii2-rss": "~0.1"
+    "yiisoft/yii2": "~2"
   },
   "autoload": {
     "psr-4": {

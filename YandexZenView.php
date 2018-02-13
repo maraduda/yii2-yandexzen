@@ -2,13 +2,12 @@
 
 namespace Maraduda\yii\extensions\YandexZen;
 
-use Zelenin\yii\extensions\Rss\RssView;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\widgets\BaseListView;
 
-class YandexZenView extends RssView
+class YandexZenView extends BaseListView
 {
     /**
      * @var Feed
@@ -134,10 +133,33 @@ class YandexZenView extends RssView
             } else {
                 $result = call_user_func($value, $model, $this, $this->getFeed());
                 if (is_string($result)) {
-                    $this->getFeed()->addItemElement($element, $result);
+                    if ($element == 'content:encoded') {
+                        $result = $this->prepareText($result);
+                        $this->getFeed()->addCDATASection($element, $result);
+                    }
+                    else {
+                        $result = strip_tags($result);
+                        $this->getFeed()->addItemElement($element, $result);
+                    }
                 }
             }
         }
+    }
+
+    /**
+     * @param $text
+     * @return null|string|string[]
+     */
+    private function prepareText($text)
+    {
+        $text = preg_replace('/<\s*style.+?<\s*\/\s*style.*?>/si', '', $text);
+        $text = strip_tags($text, '<img><video><source>');
+        $text = preg_replace('/(<img.+?>)/iu','<figure>$1</figure>', $text);
+        $text = preg_replace('#(<img\s[^>]*?\bsrc\s*=\s*[\'"]?)/#i', '$1' . ArrayHelper::getValue($this->channel, 'link'), $text);
+        $text = preg_replace('/(<video.+?>)/iu','<figure>$1', $text);
+        $text = preg_replace('/(<\/video>)/iu','$1</figure>', $text);
+        $text = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $text);
+        return $text;
     }
 
     /**
