@@ -153,6 +153,7 @@ class YandexZenView extends BaseListView
     private function prepareText($text)
     {
         $text = preg_replace('/<\s*style.+?<\s*\/\s*style.*?>/si', '', $text);
+        $text = preg_replace('/<\s*script.+?<\s*\/\s*script.*?>/si', '', $text);
         $text = strip_tags($text, '<img><video><source>');
         $text = preg_replace('/(<img.+?>)/iu','<figure>$1</figure>', $text);
         $text = preg_replace('#(<img\s[^>]*?\bsrc\s*=\s*[\'"]?)/#i', '$1' . ArrayHelper::getValue($this->channel, 'link'), $text);
